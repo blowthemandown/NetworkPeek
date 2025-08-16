@@ -1,8 +1,6 @@
-#           This basically works, but I'd like to a cmd line argument pointing at a specific device, defaulting to your own device
-#           I need to add a host discovery option, just a list of IP addresses
+#           
+#
 import nmap3
-#import nmap
-#I had to download and install nmap from nmap.org because it wasn't already on Windows 10 Home
 import socket
 
 import sys#for args, but also has classes and functions for IP addresses?
@@ -22,8 +20,6 @@ nmap = nmap3.NmapHostDiscovery()#  What's the difference?  Should I move this do
 
 
 
-#maybe just print a list of hosts on the network?
-
 
 hostName = socket.gethostname()#DESKTOP-G97TUT7
 IPAddr = socket.gethostbyname(hostName)#192.168.1.84
@@ -32,7 +28,6 @@ IPAddr = socket.gethostbyname(hostName)#192.168.1.84
 scan = False
 if(len(sys.argv) == 1):
     print("You can add an IP Adress as an argument, or case-sensitive 'scan' to find all the address on your network.  Defaulting to own address.")
-    #scan=True#                                      TEMPORARILY FFS                                  DELETE THIS WHEN I'M DONE DEVELOPING
 elif sys.argv[1] == "scan":
     scan = True
 else:
@@ -83,8 +78,7 @@ if(scan):
         print(address)
 else:
     ports = output.get(IPAddr).get('ports')#ports is a list, a list of dicts I think, god help me
-    #print("the number of ports should be "+ str(len(ports)))  #no, no, I'm only printing the open ports, remember?
-    #print(ports)
+
     for port in ports:
         if port['state'] == 'open':
             openPorts.append(port['portid'])
@@ -97,25 +91,5 @@ else:
 
 
 
-import os
 
-import uuid
 import TextParser
-import sys
-
-def originalPlan():
-    original = sys.stdout
-    sys.stdout = open('temp.txt','a')#is there a difference TextIO and TextIOWrapper? well, it's still going to output!!!  Does it send to the new console, and THEN to the output?
-
-    #os.system('ipconfig')#The output of the command automatically goes to stdout!  And first, it opens an actual command line window, no matter what?
-    raw = open('temp.txt','r').read()
-    parser = TextParser.TextParser(raw)
-
-    mac = parser.printMacAdd()
-    print(mac)
-
-
-    sys.stdout = original
-    os.remove('temp.txt')# just says "None"
-    
-    macAddr = hex(uuid.getnode())#doesn't have the : format
