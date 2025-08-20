@@ -86,10 +86,3 @@ else:
     for port in openPorts:
         print(port)#I can't believe I commented this out and forgot about it...
         #it works perfectly
-
-
-
-
-
-
-import TextParser
