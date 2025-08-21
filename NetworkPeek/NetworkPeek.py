@@ -1,5 +1,4 @@
-#           
-#
+
 import nmap3
 import socket
 
@@ -12,17 +11,40 @@ def IPRange(address):
     final = blank + "*"
     return final
 
+#iterate through the list, check if the port is open and add the number to my own list if it is, and then finally print the list of open ports, raw is a dict, the output of the nmap function
+def PrintPorts(raw, IP):
+    openPorts = []
+    ports = raw.get(IP).get('ports')#ports is a list, a list of dicts I think, god help me
 
+    for port in ports:
+        if port['state'] == 'open':
+            openPorts.append(port['portid'])
+    print("The following ports are open")
+    for port in openPorts:
+        print(port)#I can't believe I commented this out and forgot about it...
 
-nmap = nmap3.Nmap()
+#grab a list of key, which is a list of addresses, then iterate through the output to check if there's a hostname in that entry in the dict, and add the IP address to a list, which it prints at the end, raw is a dict, the output of the nmap function
+def PrintDevices(raw):
+    activeHosts = []
+
+    count = 0##this is probably not the best way to do this, I'm trying to cycle through key-value pairs and store the keys with the right values.
+    for host in raw:#host is the key
+        if(count<256 and raw.get(host)['hostname']!=[]):#output ends with three non-address entries, things like runtime, and they throw an error if I try to check them like this
+           activeHosts.append(host)
+        count+=1
+    #aaaaand I forgot to print it LMAO
+    print("The scan has found the following addresses:")
+    for address in activeHosts:
+        print(address)
+
 
 nmap = nmap3.NmapHostDiscovery()#  What's the difference?  Should I move this down into one of those if statements? 
 
 
 
 
-hostName = socket.gethostname()#DESKTOP-G97TUT7
-IPAddr = socket.gethostbyname(hostName)#192.168.1.84
+hostName = socket.gethostname()
+IPAddr = socket.gethostbyname(hostName)
 
 
 scan = False
@@ -45,44 +67,11 @@ else:
 #macAddr = output.get(IPAddr).get('macaddress')#says none, and that's not a mistake on my end, it's what's in the dict
 
 
-IPAddr = socket.gethostbyname(hostName)
-
-
-
-#print("the raw output for debugging:")
-#print(output)#all these ports are closed...
 
 
 
 
-
-#iterate through the list, check if the port is open and add the number to my own list if it is, and then finally print the list of open ports
-#TODO move all this onto a class, maybe wipe TextParser and put it there.  Two methods, determined in an if(scan) and pass both of them the output parameter
-openPorts = []
 if(scan):
-    activeHosts = []
-    #a dict is a bunch of key:value pairs, so just print the keys? No, it does all of them, but portscan_only frontloads the addresses that don't respond, bizarely, so use keys() to get a list, then cycle through until you hit "1.1" then print from there?
-    #_no_portscan does them in order, and quicker so just check that hostname isn't blank (!=[]) maybe) before adding it to the list
-
-    allKeys = output.keys()#returns a dict_keys view object
-    allHosts = list(allKeys)#this seems to be the easiest way
-
-    count = 0##this is probably not the best way to do this, I'm trying to cycle through key-value pairs and store the keys with the right values.
-    for host in output:
-        if(count<256 and output.get(allHosts[count])['hostname']!=[]):#output ends with three non-address entries, things like runtime, and they throw an error if I try to check them like this
-           activeHosts.append(allHosts[count])
-        count+=1
-    #aaaaand I forgot to print it LMAO
-    print("The scan has found the following addresses:")
-    for address in activeHosts:
-        print(address)
+    PrintDevices(output)
 else:
-    ports = output.get(IPAddr).get('ports')#ports is a list, a list of dicts I think, god help me
-
-    for port in ports:
-        if port['state'] == 'open':
-            openPorts.append(port['portid'])
-    print("The following ports are open")
-    for port in openPorts:
-        print(port)#I can't believe I commented this out and forgot about it...
-        #it works perfectly
+    PrintPorts(output, IPAddr)
